@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>wsg.gg</title>
+    <title>WSG.GG</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         /* --- Core Reset & Base --- */
@@ -19,7 +21,7 @@
         body, html {
             width: 100%;
             height: 100%;
-            background-color: #08080a;
+            background-color: #050505;
             overflow: hidden;
             font-family: 'Inter', sans-serif;
             color: #ffffff;
@@ -27,306 +29,186 @@
 
         /* --- Background Canvas --- */
         #canvas-container {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: 1;
-            opacity: 0.9; 
-            transition: filter 0.6s ease, opacity 0.6s ease;
+            opacity: 0.8; 
+            transition: opacity 0.6s ease;
         }
 
         canvas { display: block; }
 
-        /* --- UI Layer (Centered Layout) --- */
+        /* --- UI Layer --- */
         #ui-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
+            position: relative;
             width: 100%;
-            height: 100%;
+            height: 100vh;
             z-index: 10;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: radial-gradient(circle at center, transparent 0%, rgba(8,8,10,0.8) 100%);
-            pointer-events: none;
+            background: radial-gradient(circle at center, transparent 0%, rgba(5,5,5,0.8) 100%);
         }
 
-        /* --- Menu Container --- */
-        .menu-container {
-            pointer-events: auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 40px;
+        /* --- Central Text --- */
+        .center-content {
             text-align: center;
             opacity: 0;
             transform: translateY(20px);
             animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         @keyframes fadeUp {
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Blur Effect on Open */
-        body.modal-open #canvas-container,
-        body.modal-open .menu-container {
-            filter: blur(12px);
-            opacity: 0.2;
-            pointer-events: none;
-        }
-
-        /* --- Header --- */
-        .header-main {
+        .header-sub {
             font-family: 'Inter', sans-serif;
             font-size: 14px;
             font-weight: 500;
-            letter-spacing: 2px;
-            color: #888;
+            letter-spacing: 4px;
+            color: #ff5f5f;
             text-transform: uppercase;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 15px rgba(255, 95, 95, 0.4);
         }
 
         .brand-name {
             display: block;
-            font-size: 48px;
-            font-weight: 600;
+            font-size: 80px;
+            font-weight: 800;
             color: #fff;
-            letter-spacing: -2px;
-            margin-top: 10px;
-            margin-bottom: 40px;
+            letter-spacing: -3px;
+            line-height: 1;
+            text-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            margin-bottom: 25px;
         }
 
-        /* --- Minimal Navigation Buttons --- */
-        .nav-group {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .menu-btn {
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            font-size: 24px;
-            font-weight: 300;
-            color: #aaa;
-            transition: all 0.3s ease;
-            position: relative;
-            padding: 5px 20px;
-        }
-
-        .menu-btn:hover {
-            color: #fff;
-            transform: scale(1.05);
-        }
-
-        .menu-btn::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            width: 0;
-            height: 1px;
-            background: #fff;
-            transition: width 0.3s ease, left 0.3s ease;
-        }
-
-        .menu-btn:hover::after {
-            width: 100%;
-            left: 0;
-        }
-
-        /* --- Modal System (Improved) --- */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 100;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            pointer-events: none;
-            opacity: 0;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(8px);
-            transition: opacity 0.4s ease;
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .modal-content {
-            /* Glassmorphism Upgrade */
-            background: rgba(20, 20, 24, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-top: 1px solid rgba(255, 255, 255, 0.15); /* Top highlight */
-            border-radius: 16px;
-            padding: 40px;
-            width: 90%;
-            max-width: 520px;
-            box-shadow: 
-                0 25px 50px -12px rgba(0, 0, 0, 0.5), /* Deep shadow */
-                0 0 0 1px rgba(0,0,0,0.2); /* Subtle outline */
-            
-            /* Bouncy Pop Animation */
-            transform: scale(0.9) translateY(20px);
-            opacity: 0;
-            transition: 
-                transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), /* Spring effect */
-                opacity 0.4s ease;
-        }
-
-        .modal-overlay.active .modal-content {
-            transform: scale(1) translateY(0);
-            opacity: 1;
-        }
-
-        /* Modal Header */
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .modal-title {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 13px;
-            letter-spacing: 1px;
-            font-weight: 600;
-            text-transform: uppercase;
-            
-            /* Gradient Text Effect */
-            background: linear-gradient(90deg, #ffffff, #999999);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .close-btn {
-            background: rgba(255,255,255,0.05);
-            border: none;
-            color: #aaa;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            font-size: 20px;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .close-btn:hover { 
-            background: rgba(255,255,255,0.15);
-            color: #fff; 
-            transform: rotate(90deg);
-        }
-
-        /* About Section */
-        .bio-text {
-            font-size: 15px;
-            line-height: 1.7;
-            color: #ccc;
-            margin-bottom: 30px;
-        }
-
-        .stats-row {
+        /* --- Center Tags --- */
+        .center-tags {
             display: flex;
             gap: 15px;
-            margin-top: 20px;
+            justify-content: center;
         }
 
-        .stat {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.03);
-            padding: 15px;
-            border-radius: 12px;
-            text-align: center;
-            border: 1px solid transparent;
+        .tag-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            color: #ccc;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            font-weight: 500;
+            backdrop-filter: blur(4px);
             transition: all 0.3s ease;
         }
 
-        .stat:hover {
-            border-color: rgba(255, 255, 255, 0.1);
-            background: rgba(255, 255, 255, 0.05);
+        .tag-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
             transform: translateY(-2px);
         }
 
-        .stat-num {
-            display: block;
-            font-size: 24px;
-            font-weight: 600;
-            color: #fff;
-            margin-bottom: 5px;
+        .tag-icon {
+            color: #ff5f5f;
+            font-size: 12px;
         }
 
-        .stat-label {
-            font-size: 10px;
-            color: #777;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        /* Project List */
-        .project-list {
+        /* --- Social Dock (Top Right) --- */
+        .social-dock {
+            position: fixed;
+            top: 40px;
+            right: 0;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
+            align-items: flex-end;
+            padding-right: 0; /* Flush with edge */
+            z-index: 100;
         }
 
-        .project-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 10px;
-            border: 1px solid transparent;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .project-item:hover {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(255, 255, 255, 0.1);
-            transform: translateX(5px);
-        }
-
-        .project-name { font-size: 15px; font-weight: 500; color: #eee; }
-        .project-meta { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #666; }
-
-        /* Contact Section */
-        .social-link {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px;
-            background: rgba(255, 255, 255, 0.02);
-            color: #aaa;
+        .dock-item {
+            /* Glass styling */
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-right: none; /* Connect to edge */
+            
+            /* Shape */
+            padding: 12px 24px 12px 30px;
+            border-radius: 12px 0 0 12px;
+            
+            /* Typography */
+            color: #ccc;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
             text-decoration: none;
-            margin-bottom: 12px;
-            border-radius: 10px;
-            border: 1px solid transparent;
-            transition: all 0.2s;
+            cursor: pointer;
+            
+            /* Layout */
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            
+            /* Animation / Hiding Logic */
+            transform: translateX(15px); /* Hidden a little bit */
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
         }
 
-        .social-link:hover {
-            background: rgba(255, 255, 255, 0.06);
+        .dock-item:hover {
+            transform: translateX(-10px); /* Pop out */
+            background: rgba(255, 255, 255, 0.1);
             color: #fff;
-            border-color: rgba(255, 255, 255, 0.1);
-            transform: translateX(5px);
+            padding-right: 30px;
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: -5px 5px 20px rgba(0,0,0,0.3);
+        }
+
+        /* Hover colors */
+        .dock-item.discord:hover { border-left: 3px solid #5865F2; }
+        .dock-item.roblox:hover { border-left: 3px solid #ffffff; }
+        .dock-item.github:hover { border-left: 3px solid #333; }
+
+        .arrow {
+            color: #ff5f5f;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+
+        .dock-item:hover .arrow {
+            transform: translateX(3px);
+            color: #fff;
+        }
+        
+        .copy-feedback {
+            position: absolute;
+            left: -80px;
+            background: #00ff9d;
+            color: #000;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        
+        .copy-feedback.show {
+            opacity: 1;
         }
 
     </style>
@@ -338,70 +220,88 @@
     </div>
 
     <div id="ui-layer">
-        <div class="menu-container">
-            <div>
-                <div class="header-main">WSG.GG</div>
-                <h1 class="brand-name">ZOTIAX</h1>
-            </div>
+        
+        <!-- Central Text -->
+        <div class="center-content">
+            <div class="header-sub">WSG.GG</div>
+            <h1 class="brand-name">ZOTIAX</h1>
             
-            <div class="nav-group">
-                <button class="menu-btn" id="btn-about">About</button>
-                <button class="menu-btn" id="btn-contact">Contact</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- About Modal -->
-    <div id="modal-about" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span class="modal-title">01 / Profile</span>
-                <button class="close-btn">&times;</button>
-            </div>
-            <div class="bio-text">
-                I have over three years of coding experience, specializing in HTML, CSS, JavaScript, Lua, C++, and Python.
-
-
-I am essentially a creator—if I can imagine it, I can build it. If you are looking to commission a project or hire me for a role, please reach out to me via the Discord link in the contact tab..
-            </div>
-            <div class="stats-row">
-                <div class="stat">
-                    <span class="stat-num">3+</span>
-                    <span class="stat-label">Years Exp</span>
+            <!-- Tags -->
+            <div class="center-tags">
+                <div class="tag-item">
+                    <i class="fa-solid fa-code tag-icon"></i>
+                    <span>Scripter</span>
                 </div>
-                <div class="stat">
-                    <span class="stat-num">4</span>
-                    <span class="stat-label">Projects</span>
-                </div>
-                <div class="stat">
-                    <span class="stat-num">PL</span>
-                    <span class="stat-label">Based In</span>
+                <div class="tag-item">
+                    <i class="fa-solid fa-location-dot tag-icon"></i>
+                    <span>Poland</span>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Contact Modal -->
-    <div id="modal-contact" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span class="modal-title">02 / Connection</span>
-                <button class="close-btn">&times;</button>
-            </div>
-            <a href="#" class="social-link">
-                <span>GitHub</span>
-                <span>@zotiax</span>
-            </a>
-            <div class="social-link">
+        <!-- Right Side Social Panels -->
+        <div class="social-dock">
+            
+            <!-- Discord -->
+            <div class="dock-item discord" onclick="copyDiscord()">
+                <span class="copy-feedback" id="discord-feedback">COPIED</span>
                 <span>Discord</span>
-                <span style="font-size: 11px;">@zotiax (1013149488476594226)</span>
+                <span class="arrow">-></span>
             </div>
+
+            <!-- Roblox -->
+            <a href="https://www.roblox.com/users/7237107162/profile" target="_blank" class="dock-item roblox">
+                <span>Roblox</span>
+                <span class="arrow">-></span>
+            </a>
+
+            <!-- GitHub -->
+            <a href="https://github.com/zotiax" target="_blank" class="dock-item github">
+                <span>GitHub</span>
+                <span class="arrow">-></span>
+            </a>
+
         </div>
+
     </div>
 
     <script>
+        // --- Discord Copy Function ---
+        function copyDiscord() {
+            const userId = "zotiax";
+            
+            // Fallback for iframe/permissions policy restrictions using execCommand
+            const textArea = document.createElement("textarea");
+            textArea.value = userId;
+            
+            // Ensure element is not visible but part of DOM
+            textArea.style.position = "fixed";
+            textArea.style.left = "-9999px";
+            textArea.style.top = "0";
+            document.body.appendChild(textArea);
+            
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                if(successful) {
+                    const feedback = document.getElementById('discord-feedback');
+                    feedback.classList.add('show');
+                    
+                    setTimeout(() => {
+                        feedback.classList.remove('show');
+                    }, 1500);
+                }
+            } catch (err) {
+                console.error('Fallback: Oops, unable to copy', err);
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        // --- Background Canvas Code ---
         {
-            /* --- Canvas Setup --- */
             const canvas = document.getElementById('bg-canvas');
             const ctx = canvas.getContext('2d');
             let width, height;
@@ -412,10 +312,6 @@ I am essentially a creator—if I can imagine it, I can build it. If you are loo
             const fontWidth = fontSize * 0.6; 
             let cols, rows;
             
-            // Mouse
-            let mouse = { x: 0, y: 0 };
-            let targetMouse = { x: 0, y: 0 };
-
             // Code Animation
             const codeLines = [];
             let currentLineIndex = 0;
@@ -426,42 +322,67 @@ I am essentially a creator—if I can imagine it, I can build it. If you are loo
             let cursorBlink = 0;
             let typeDelay = 0;
 
-            // Minimal Source Code for visual effect
+            // Realistic Lua/Roblox Source Code
             const sourceCode = [
-                "class DigitalMind {",
-                "  constructor() {",
-                "    this.synapses = new Map();",
-                "    this.consciousness = 0;",
-                "  }",
+                "-- Zotiax Engine Kernel v2.4",
+                "local RunService = game:GetService('RunService')",
+                "local Players = game:GetService('Players')",
+                "local TweenService = game:GetService('TweenService')",
                 "",
-                "  async awaken() {",
-                "    while(this.consciousness < 1.0) {",
-                "      await this.learn();",
-                "      this.consciousness += 0.01;",
-                "    }",
-                "    return new Sentience();",
-                "  }",
-                "",
-                "  render() {",
-                "    const world = new World();",
-                "    world.mount(this);",
-                "  }",
+                "local CONFIG = {",
+                "    Speed = 32,",
+                "    JumpPower = 50,",
+                "    Theme = Color3.fromRGB(255, 95, 95),",
+                "    Debug = true",
                 "}",
-                "// Initiating sequence...",
-                "const mind = new DigitalMind();",
-                "mind.awaken();"
+                "",
+                "local function initCharacter(character)",
+                "    local humanoid = character:WaitForChild('Humanoid')",
+                "    local root = character:WaitForChild('HumanoidRootPart')",
+                "    ",
+                "    if CONFIG.Debug then",
+                "        print('[SYSTEM] Hooking character: ' .. character.Name)",
+                "    end",
+                "    ",
+                "    -- Apply movement bypass",
+                "    humanoid.WalkSpeed = CONFIG.Speed",
+                "    humanoid.UseJumpPower = true",
+                "    humanoid.JumpPower = CONFIG.JumpPower",
+                "    ",
+                "    -- Create visual aura",
+                "    local highlight = Instance.new('Highlight')",
+                "    highlight.FillColor = CONFIG.Theme",
+                "    highlight.OutlineColor = Color3.new(1, 1, 1)",
+                "    highlight.Parent = character",
+                "end",
+                "",
+                "Players.PlayerAdded:Connect(function(player)",
+                "    player.CharacterAdded:Connect(initCharacter)",
+                "end)",
+                "",
+                "RunService.Heartbeat:Connect(function(dt)",
+                "    -- Optimization Loop",
+                "    for _, player in ipairs(Players:GetPlayers()) do",
+                "        if player ~= Players.LocalPlayer then",
+                "            -- Esp / Tracking Logic",
+                "        end",
+                "    end",
+                "end)"
             ];
 
-            // --- Syntax Highlighting Colors ---
+            // Enhanced Syntax Theme (Dracula/VSCode style)
             const theme = {
-                keyword: '#ff5f5f',   // Red
-                function: '#5dade2',  // Blue
-                string: '#2ecc71',    // Green
-                comment: '#777777',   // Grey
-                default: '#e0e0e0'    // Off-white
+                keyword: '#ff79c6',   // Pink (local, if, then, end)
+                builtin: '#8be9fd',   // Cyan (GetService, WaitForChild)
+                string: '#f1fa8c',    // Yellow
+                number: '#bd93f9',    // Purple
+                comment: '#6272a4',   // Grey-Blue
+                property: '#50fa7b',  // Green
+                default: '#f8f8f2'    // White
             };
             
-            const keywords = ['class', 'const', 'let', 'var', 'async', 'await', 'return', 'new', 'this', 'if', 'while'];
+            const keywords = ['local', 'function', 'end', 'if', 'then', 'else', 'return', 'true', 'false'];
+            const builtins = ['game', 'workspace', 'Instance', 'Color3', 'Vector3', 'new', 'fromRGB', 'Connect', 'WaitForChild', 'GetService'];
 
             function resize() {
                 const dpr = window.devicePixelRatio || 1;
@@ -474,21 +395,14 @@ I am essentially a creator—if I can imagine it, I can build it. If you are loo
                 rows = Math.floor(height / lineHeight);
                 ctx.font = `${fontSize}px 'JetBrains Mono', monospace`;
                 ctx.textBaseline = 'top';
-                targetMouse.x = width / 2;
-                targetMouse.y = height / 2;
             }
-
-            document.addEventListener('mousemove', (e) => {
-                targetMouse.x = e.clientX;
-                targetMouse.y = e.clientY;
-            });
 
             function updateCode() {
                 if (typeDelay > 0) { typeDelay--; return; }
                 
-                // Typing logic
-                let chars = Math.floor(Math.random() * 2) + 1;
-                if (Math.random() > 0.98) typeDelay = 20;
+                // Varied typing speed
+                let chars = Math.floor(Math.random() * 3) + 1;
+                if (Math.random() > 0.95) typeDelay = 15; // Pause sometimes
 
                 for(let k=0; k<chars; k++) {
                     const lineStr = sourceCode[currentLineIndex % sourceCode.length];
@@ -501,7 +415,7 @@ I am essentially a creator—if I can imagine it, I can build it. If you are loo
                         currentLineIndex++;
                         currentCharIndex = 0;
                         codeLines.push({ text: "" });
-                        typeDelay = 5;
+                        typeDelay = 8; // Line break pause
                         if (codeLines.length > rows + 2) {
                             targetScrollY = (codeLines.length - (rows - 2)) * lineHeight;
                         }
@@ -509,10 +423,9 @@ I am essentially a creator—if I can imagine it, I can build it. If you are loo
                 }
             }
 
-            // --- New Highlight Function ---
             function drawHighlightedLine(text, x, y) {
                 // Comments
-                if (text.trim().startsWith('//')) {
+                if (text.trim().startsWith('--')) {
                     ctx.fillStyle = theme.comment;
                     ctx.fillText(text, x, y);
                     return;
@@ -525,12 +438,17 @@ I am essentially a creator—if I can imagine it, I can build it. If you are loo
                     const part = parts[i];
                     if (!part) continue;
 
+                    // Syntax Logic
                     if (keywords.includes(part)) {
                         ctx.fillStyle = theme.keyword;
-                    } else if (i + 1 < parts.length && parts[i+1] === '(') {
-                        ctx.fillStyle = theme.function;
+                    } else if (builtins.includes(part)) {
+                        ctx.fillStyle = theme.builtin;
                     } else if (part.startsWith("'") || part.startsWith('"')) {
                         ctx.fillStyle = theme.string;
+                    } else if (!isNaN(parseFloat(part)) && isFinite(part)) {
+                        ctx.fillStyle = theme.number;
+                    } else if (i > 0 && parts[i-1] === '.') {
+                        ctx.fillStyle = theme.property;
                     } else {
                         ctx.fillStyle = theme.default;
                     }
@@ -541,19 +459,14 @@ I am essentially a creator—if I can imagine it, I can build it. If you are loo
             }
 
             function draw() {
-                // Parallax 
-                mouse.x += (targetMouse.x - mouse.x) * 0.05;
-                mouse.y += (targetMouse.y - mouse.y) * 0.05;
-                const shiftX = (width/2 - mouse.x) * 0.01;
-                const shiftY = (height/2 - mouse.y) * 0.01;
-
+                // Auto scroll logic (no mouse parallax for cleaner look)
                 scrollY += (targetScrollY - scrollY) * 0.1;
 
-                ctx.fillStyle = '#08080a';
+                ctx.fillStyle = '#050505';
                 ctx.fillRect(0, 0, width, height);
 
-                const startY = 40 - scrollY + shiftY;
-                const startX = 40 + shiftX;
+                const startY = 40 - scrollY;
+                const startX = 40;
 
                 for (let i = 0; i < codeLines.length; i++) {
                     const line = codeLines[i];
@@ -561,21 +474,21 @@ I am essentially a creator—if I can imagine it, I can build it. If you are loo
                     if (y < -lineHeight || y > height) continue;
 
                     // Line Numbers
-                    ctx.fillStyle = '#444'; 
+                    ctx.fillStyle = '#444';
                     ctx.textAlign = 'right';
-                    ctx.fillText(i + 1, startX + 30, y);
+                    ctx.fillText(i + 1, startX - 15, y);
 
-                    // Code with Highlights
+                    // Code
                     ctx.textAlign = 'left';
-                    drawHighlightedLine(line.text, startX + 50, y);
+                    drawHighlightedLine(line.text, startX, y);
 
                     // Cursor
                     if (i === codeLines.length - 1) {
                         cursorBlink++;
                         const alpha = (Math.sin(cursorBlink * 0.1) + 1) / 2;
                         const w = ctx.measureText(line.text).width;
-                        ctx.fillStyle = `rgba(200, 200, 200, ${alpha})`;
-                        ctx.fillRect(startX + 50 + w + 2, y + 2, 2, fontSize);
+                        ctx.fillStyle = `rgba(255, 95, 95, ${alpha})`;
+                        ctx.fillRect(startX + w + 2, y + 2, 2, fontSize);
                     }
                 }
             }
@@ -585,34 +498,6 @@ I am essentially a creator—if I can imagine it, I can build it. If you are loo
                 draw();
                 requestAnimationFrame(animate);
             }
-
-            // --- Modal Logic ---
-            const modals = {
-                about: document.getElementById('modal-about'),
-                contact: document.getElementById('modal-contact')
-            };
-
-            function openModal(id) {
-                document.body.classList.add('modal-open');
-                Object.values(modals).forEach(m => m.classList.remove('active'));
-                modals[id].classList.add('active');
-            }
-
-            function closeAll() {
-                document.body.classList.remove('modal-open');
-                Object.values(modals).forEach(m => m.classList.remove('active'));
-            }
-
-            document.getElementById('btn-about').addEventListener('click', () => openModal('about'));
-            document.getElementById('btn-contact').addEventListener('click', () => openModal('contact'));
-
-            document.querySelectorAll('.close-btn').forEach(btn => btn.addEventListener('click', closeAll));
-            
-            Object.values(modals).forEach(m => {
-                m.addEventListener('click', (e) => {
-                    if (e.target === m) closeAll();
-                });
-            });
 
             resize();
             window.addEventListener('resize', resize);
