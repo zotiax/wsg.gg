@@ -6,7 +6,7 @@
     <title>WSG.GG</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -41,6 +41,26 @@
 
         canvas { display: block; }
 
+        /* --- CRT Scanline Overlay --- */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            background: linear-gradient(
+                to bottom,
+                rgba(255,255,255,0),
+                rgba(255,255,255,0) 50%,
+                rgba(0,0,0,0.1) 50%,
+                rgba(0,0,0,0.1)
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
         /* --- UI Layer --- */
         #ui-layer {
             position: relative;
@@ -71,23 +91,38 @@
         .header-sub {
             font-family: 'Inter', sans-serif;
             font-size: 14px;
-            font-weight: 500;
-            letter-spacing: 4px;
+            font-weight: 600;
+            letter-spacing: 6px;
             color: #ff5f5f;
             text-transform: uppercase;
-            margin-bottom: 15px;
-            text-shadow: 0 0 15px rgba(255, 95, 95, 0.4);
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px rgba(255, 95, 95, 0.6);
         }
 
         .brand-name {
             display: block;
-            font-size: 80px;
+            font-size: 90px;
             font-weight: 800;
             color: #fff;
-            letter-spacing: -3px;
+            letter-spacing: -4px;
             line-height: 1;
-            text-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            margin-bottom: 25px;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+            position: relative;
+            cursor: default;
+            animation: textBreath 4s ease-in-out infinite alternate;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+        }
+
+        @keyframes textBreath {
+            from { text-shadow: 0 0 20px rgba(255, 255, 255, 0.1); }
+            to { text-shadow: 0 0 40px rgba(255, 255, 255, 0.3); }
+        }
+
+        /* Clean Red Highlight on Hover (No Glitch) */
+        .brand-name:hover {
+            color: #ff5f5f;
+            text-shadow: 0 0 40px rgba(255, 95, 95, 0.6);
         }
 
         /* --- Center Tags --- */
@@ -101,28 +136,76 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 8px 16px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
+            padding: 10px 20px;
+            background: rgba(20, 20, 20, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 30px;
             color: #ccc;
             font-family: 'JetBrains Mono', monospace;
             font-size: 12px;
             font-weight: 500;
-            backdrop-filter: blur(4px);
+            backdrop-filter: blur(10px);
             transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
         .tag-item:hover {
             background: rgba(255, 255, 255, 0.1);
             border-color: rgba(255, 255, 255, 0.2);
             color: #fff;
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255, 95, 95, 0.1);
         }
 
         .tag-icon {
             color: #ff5f5f;
-            font-size: 12px;
+            font-size: 14px;
+        }
+
+        /* --- Tech Stack --- */
+        .tech-stack {
+            margin-top: 35px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .stack-label {
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .stack-list {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 500px;
+        }
+
+        .stack-item {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: #999;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.2s ease;
+            cursor: default;
+        }
+
+        .stack-item:hover {
+            color: #fff;
+            border-color: rgba(255, 95, 95, 0.3);
+            background: rgba(255, 95, 95, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 95, 95, 0.1);
         }
 
         /* --- Social Dock (Top Right) --- */
@@ -134,47 +217,48 @@
             flex-direction: column;
             gap: 12px;
             align-items: flex-end;
-            padding-right: 0; /* Flush with edge */
+            padding-right: 0; 
             z-index: 100;
         }
 
         .dock-item {
             /* Glass styling */
-            background: rgba(20, 20, 20, 0.6);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: rgba(15, 15, 15, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-right: none; /* Connect to edge */
+            border-right: none; 
             
             /* Shape */
-            padding: 12px 24px 12px 30px;
-            border-radius: 12px 0 0 12px;
+            padding: 14px 28px 14px 32px;
+            border-radius: 16px 0 0 16px;
             
             /* Typography */
-            color: #ccc;
+            color: #aaa;
             font-family: 'JetBrains Mono', monospace;
             font-size: 13px;
             text-decoration: none;
             cursor: pointer;
+            font-weight: 500;
             
             /* Layout */
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             
-            /* Animation / Hiding Logic */
-            transform: translateX(15px); /* Hidden a little bit */
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            /* Animation */
+            transform: translateX(20px); /* Hidden slightly */
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             position: relative;
         }
 
         .dock-item:hover {
-            transform: translateX(-10px); /* Pop out */
-            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(0); /* Pop fully out */
+            background: rgba(30, 30, 30, 0.9);
             color: #fff;
-            padding-right: 30px;
-            border-color: rgba(255, 255, 255, 0.2);
-            box-shadow: -5px 5px 20px rgba(0,0,0,0.3);
+            padding-right: 40px;
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: -10px 10px 30px rgba(0,0,0,0.4);
         }
 
         /* Hover colors */
@@ -182,15 +266,28 @@
         .dock-item.roblox:hover { border-left: 3px solid #ffffff; }
         .dock-item.github:hover { border-left: 3px solid #333; }
 
+        .dock-icon {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+            transition: color 0.3s;
+        }
+        
+        /* Icon colors on hover */
+        .dock-item.discord:hover .dock-icon { color: #5865F2; }
+        .dock-item.github:hover .dock-icon { color: #fff; }
+        
         .arrow {
             color: #ff5f5f;
             font-weight: bold;
-            transition: transform 0.3s ease;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.3s ease;
         }
 
         .dock-item:hover .arrow {
-            transform: translateX(3px);
-            color: #fff;
+            opacity: 1;
+            transform: translateX(0);
         }
         
         .copy-feedback {
@@ -198,17 +295,20 @@
             left: -80px;
             background: #00ff9d;
             color: #000;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 10px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 11px;
             font-weight: bold;
             opacity: 0;
+            transform: translateX(10px);
             pointer-events: none;
-            transition: opacity 0.3s;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 5px 15px rgba(0, 255, 157, 0.2);
         }
         
         .copy-feedback.show {
             opacity: 1;
+            transform: translateX(0);
         }
 
     </style>
@@ -218,6 +318,9 @@
     <div id="canvas-container">
         <canvas id="bg-canvas"></canvas>
     </div>
+    
+    <!-- CRT Overlay -->
+    <div class="scanlines"></div>
 
     <div id="ui-layer">
         
@@ -237,6 +340,19 @@
                     <span>Poland</span>
                 </div>
             </div>
+
+            <!-- Tech Stack -->
+            <div class="tech-stack">
+                <div class="stack-label">I Code In</div>
+                <div class="stack-list">
+                    <div class="stack-item">Lua</div>
+                    <div class="stack-item">LuaC</div>
+                    <div class="stack-item">CSS</div>
+                    <div class="stack-item">HTML</div>
+                    <div class="stack-item">Python</div>
+                    <div class="stack-item">JavaScript</div>
+                </div>
+            </div>
         </div>
 
         <!-- Right Side Social Panels -->
@@ -245,18 +361,21 @@
             <!-- Discord -->
             <div class="dock-item discord" onclick="copyDiscord()">
                 <span class="copy-feedback" id="discord-feedback">COPIED</span>
+                <i class="fa-brands fa-discord dock-icon"></i>
                 <span>Discord</span>
                 <span class="arrow">-></span>
             </div>
 
             <!-- Roblox -->
             <a href="https://www.roblox.com/users/7237107162/profile" target="_blank" class="dock-item roblox">
+                <i class="fa-solid fa-gamepad dock-icon"></i>
                 <span>Roblox</span>
                 <span class="arrow">-></span>
             </a>
 
             <!-- GitHub -->
             <a href="https://github.com/zotiax" target="_blank" class="dock-item github">
+                <i class="fa-brands fa-github dock-icon"></i>
                 <span>GitHub</span>
                 <span class="arrow">-></span>
             </a>
@@ -307,20 +426,23 @@
             let width, height;
 
             // Config
-            const fontSize = 14;
-            const lineHeight = 24;
-            const fontWidth = fontSize * 0.6; 
+            const fontSize = 15;
+            const lineHeight = 26;
             let cols, rows;
             
-            // Code Animation
+            // State
             const codeLines = [];
+            const particles = []; // Particle System
+            
             let currentLineIndex = 0;
             let currentCharIndex = 0;
-            let totalLinesTyped = 1;
             let scrollY = 0;
             let targetScrollY = 0;
             let cursorBlink = 0;
             let typeDelay = 0;
+            
+            // Mouse for interaction
+            let mouse = { x: 0, y: 0 };
 
             // Realistic Lua/Roblox Source Code
             const sourceCode = [
@@ -370,19 +492,62 @@
                 "end)"
             ];
 
-            // Enhanced Syntax Theme (Dracula/VSCode style)
+            // Monochromatic Red Syntax Theme
             const theme = {
-                keyword: '#ff79c6',   // Pink (local, if, then, end)
-                builtin: '#8be9fd',   // Cyan (GetService, WaitForChild)
-                string: '#f1fa8c',    // Yellow
-                number: '#bd93f9',    // Purple
-                comment: '#6272a4',   // Grey-Blue
-                property: '#50fa7b',  // Green
-                default: '#f8f8f2'    // White
+                keyword: '#ff5f5f',   // Base Red
+                builtin: '#ff8f8f',   // Light Red/Pink
+                string: '#ffaaaa',    // Pale Red
+                number: '#ff5f5f',    // Base Red
+                comment: '#7a3333',   // Dark Desaturated Red
+                property: '#ffcece',  // Very Pale Red/White
+                default: '#e06666'    // Muted Red
             };
             
             const keywords = ['local', 'function', 'end', 'if', 'then', 'else', 'return', 'true', 'false'];
             const builtins = ['game', 'workspace', 'Instance', 'Color3', 'Vector3', 'new', 'fromRGB', 'Connect', 'WaitForChild', 'GetService'];
+
+            // --- Particle Class ---
+            class Particle {
+                constructor() {
+                    this.reset();
+                }
+                
+                reset() {
+                    this.x = Math.random() * width;
+                    this.y = Math.random() * height;
+                    this.size = Math.random() * 2;
+                    this.speedX = (Math.random() - 0.5) * 0.5;
+                    this.speedY = (Math.random() - 0.5) * 0.5;
+                    this.alpha = Math.random() * 0.5;
+                    this.life = Math.random() * 100;
+                }
+                
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    this.life--;
+                    
+                    // Mouse interaction
+                    const dx = mouse.x - this.x;
+                    const dy = mouse.y - this.y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    if (dist < 100) {
+                        this.x -= dx * 0.01;
+                        this.y -= dy * 0.01;
+                    }
+
+                    if (this.x < 0 || this.x > width || this.y < 0 || this.y > height || this.life < 0) {
+                        this.reset();
+                    }
+                }
+                
+                draw() {
+                    ctx.fillStyle = `rgba(255, 95, 95, ${this.alpha})`; // Reddish dust
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
 
             function resize() {
                 const dpr = window.devicePixelRatio || 1;
@@ -391,18 +556,26 @@
                 canvas.width = width * dpr;
                 canvas.height = height * dpr;
                 ctx.scale(dpr, dpr);
-                cols = Math.floor(width / fontWidth);
+                cols = Math.floor(width / (fontSize * 0.6));
                 rows = Math.floor(height / lineHeight);
                 ctx.font = `${fontSize}px 'JetBrains Mono', monospace`;
                 ctx.textBaseline = 'top';
+                
+                // Init Particles
+                particles.length = 0;
+                for(let i=0; i<50; i++) particles.push(new Particle());
             }
+
+            document.addEventListener('mousemove', (e) => {
+                mouse.x = e.clientX;
+                mouse.y = e.clientY;
+            });
 
             function updateCode() {
                 if (typeDelay > 0) { typeDelay--; return; }
                 
-                // Varied typing speed
                 let chars = Math.floor(Math.random() * 3) + 1;
-                if (Math.random() > 0.95) typeDelay = 15; // Pause sometimes
+                if (Math.random() > 0.95) typeDelay = 15; 
 
                 for(let k=0; k<chars; k++) {
                     const lineStr = sourceCode[currentLineIndex % sourceCode.length];
@@ -415,7 +588,7 @@
                         currentLineIndex++;
                         currentCharIndex = 0;
                         codeLines.push({ text: "" });
-                        typeDelay = 8; // Line break pause
+                        typeDelay = 8; 
                         if (codeLines.length > rows + 2) {
                             targetScrollY = (codeLines.length - (rows - 2)) * lineHeight;
                         }
@@ -424,9 +597,9 @@
             }
 
             function drawHighlightedLine(text, x, y) {
-                // Comments
-                if (text.trim().startsWith('--')) {
+                if (text.trim().startsWith('--')) { 
                     ctx.fillStyle = theme.comment;
+                    ctx.shadowBlur = 0;
                     ctx.fillText(text, x, y);
                     return;
                 }
@@ -438,11 +611,17 @@
                     const part = parts[i];
                     if (!part) continue;
 
-                    // Syntax Logic
+                    // Reset Shadow
+                    ctx.shadowBlur = 0;
+
                     if (keywords.includes(part)) {
                         ctx.fillStyle = theme.keyword;
+                        ctx.shadowColor = theme.keyword;
+                        ctx.shadowBlur = 6;
                     } else if (builtins.includes(part)) {
                         ctx.fillStyle = theme.builtin;
+                        ctx.shadowColor = theme.builtin;
+                        ctx.shadowBlur = 4;
                     } else if (part.startsWith("'") || part.startsWith('"')) {
                         ctx.fillStyle = theme.string;
                     } else if (!isNaN(parseFloat(part)) && isFinite(part)) {
@@ -459,37 +638,45 @@
             }
 
             function draw() {
-                // Auto scroll logic (no mouse parallax for cleaner look)
                 scrollY += (targetScrollY - scrollY) * 0.1;
 
-                ctx.fillStyle = '#050505';
-                ctx.fillRect(0, 0, width, height);
+                ctx.clearRect(0, 0, width, height);
 
                 const startY = 40 - scrollY;
                 const startX = 40;
 
+                // Draw Code
                 for (let i = 0; i < codeLines.length; i++) {
                     const line = codeLines[i];
                     const y = startY + (i * lineHeight);
                     if (y < -lineHeight || y > height) continue;
 
-                    // Line Numbers
-                    ctx.fillStyle = '#444';
+                    ctx.fillStyle = '#663333'; // Dark red line numbers
+                    ctx.shadowBlur = 0; 
                     ctx.textAlign = 'right';
                     ctx.fillText(i + 1, startX - 15, y);
 
-                    // Code
                     ctx.textAlign = 'left';
                     drawHighlightedLine(line.text, startX, y);
 
-                    // Cursor
                     if (i === codeLines.length - 1) {
                         cursorBlink++;
                         const alpha = (Math.sin(cursorBlink * 0.1) + 1) / 2;
                         const w = ctx.measureText(line.text).width;
+                        
+                        ctx.shadowBlur = 10;
+                        ctx.shadowColor = '#ff5f5f';
                         ctx.fillStyle = `rgba(255, 95, 95, ${alpha})`;
-                        ctx.fillRect(startX + w + 2, y + 2, 2, fontSize);
+                        ctx.fillRect(startX + w + 2, y + 4, 10, fontSize - 4);
                     }
+                }
+
+                // Draw Particles
+                ctx.shadowBlur = 4;
+                ctx.shadowColor = 'rgba(255, 95, 95, 0.5)';
+                for (let p of particles) {
+                    p.update();
+                    p.draw();
                 }
             }
 
