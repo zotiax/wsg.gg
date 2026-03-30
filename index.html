@@ -3,693 +3,257 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WSG.GG</title>
+    <title>Loading... endless.net</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Import Island Moments font from Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    <link href="https://fonts.googleapis.com/css2?family=Island+Moments&display=swap" rel="stylesheet">
+    
     <style>
-        /* --- Core Reset & Base --- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* Apply the custom font */
+        .font-island {
+            font-family: 'Island Moments', cursive;
         }
 
-        body, html {
-            width: 100%;
-            height: 100%;
-            background-color: #050505;
-            overflow: hidden;
-            font-family: 'Inter', sans-serif;
-            color: #ffffff;
-        }
-
-        /* --- Background Canvas --- */
-        #canvas-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            opacity: 0.8; 
-            transition: opacity 0.6s ease;
-        }
-
-        canvas { display: block; }
-
-        /* --- CRT Scanline Overlay --- */
-        .scanlines {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 5;
+        /* Phasing purple/gray gradient text */
+        .phasing-text {
             background: linear-gradient(
-                to bottom,
-                rgba(255,255,255,0),
-                rgba(255,255,255,0) 50%,
-                rgba(0,0,0,0.1) 50%,
-                rgba(0,0,0,0.1)
+                90deg, 
+                #9ca3af 0%,     
+                #d8b4fe 30%,    
+                #a855f7 50%,    
+                #d8b4fe 70%,    
+                #9ca3af 100%    
             );
-            background-size: 100% 4px;
-            pointer-events: none;
-            opacity: 0.6;
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: phase 4s linear infinite;
         }
 
-        /* --- UI Layer --- */
-        #ui-layer {
-            position: relative;
-            width: 100%;
-            height: 100vh;
-            z-index: 10;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: radial-gradient(circle at center, transparent 0%, rgba(5,5,5,0.8) 100%);
+        @keyframes phase {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
         }
 
-        /* --- Central Text --- */
-        .center-content {
-            text-align: center;
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.2s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        /* Gradient mask for the loading bar to make edges disappear */
+        .fading-edges {
+            -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+            mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
         }
 
-        @keyframes fadeUp {
-            to { opacity: 1; transform: translateY(0); }
+        /* --- ANIMATION CLASSES --- */
+        .hide-loader {
+            opacity: 0 !important;
+            transform: scale(0.5) !important;
         }
 
-        .header-sub {
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: 6px;
-            color: #ff5f5f;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-            text-shadow: 0 0 15px rgba(255, 95, 95, 0.6);
+        .expand-text {
+            transform: translateY(-35px) scale(0.8) !important;
+            filter: drop-shadow(0 0 30px rgba(168, 85, 247, 0.8)) drop-shadow(0 0 60px rgba(168, 85, 247, 0.4)) !important;
+            letter-spacing: 0.1em;
         }
 
-        .brand-name {
-            display: block;
-            font-size: 90px;
-            font-weight: 800;
-            color: #fff;
-            letter-spacing: -4px;
-            line-height: 1;
-            text-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
-            margin-bottom: 30px;
-            position: relative;
-            cursor: default;
-            animation: textBreath 4s ease-in-out infinite alternate;
-            transition: color 0.3s ease, text-shadow 0.3s ease;
+        @media (min-width: 768px) {
+            .expand-text {
+                transform: translateY(-45px) scale(0.9) !important;
+            }
         }
 
-        @keyframes textBreath {
-            from { text-shadow: 0 0 20px rgba(255, 255, 255, 0.1); }
-            to { text-shadow: 0 0 40px rgba(255, 255, 255, 0.3); }
+        /* Custom Scrollbar for content */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
-
-        /* Clean Red Highlight on Hover (No Glitch) */
-        .brand-name:hover {
-            color: #ff5f5f;
-            text-shadow: 0 0 40px rgba(255, 95, 95, 0.6);
+        ::-webkit-scrollbar-track {
+            background: #000;
         }
-
-        /* --- Center Tags --- */
-        .center-tags {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
+        ::-webkit-scrollbar-thumb {
+            background: #4c1d95;
+            border-radius: 4px;
         }
-
-        .tag-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 20px;
-            background: rgba(20, 20, 20, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 30px;
-            color: #ccc;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
-            font-weight: 500;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6d28d9;
         }
-
-        .tag-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
-            color: #fff;
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(255, 95, 95, 0.1);
-        }
-
-        .tag-icon {
-            color: #ff5f5f;
-            font-size: 14px;
-        }
-
-        /* --- Tech Stack --- */
-        .tech-stack {
-            margin-top: 35px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .stack-label {
-            font-family: 'Inter', sans-serif;
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 2px;
-            color: #666;
-            text-transform: uppercase;
-        }
-
-        .stack-list {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            justify-content: center;
-            max-width: 500px;
-        }
-
-        .stack-item {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
-            color: #999;
-            background: rgba(255, 255, 255, 0.03);
-            padding: 6px 12px;
-            border-radius: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.2s ease;
-            cursor: default;
-        }
-
-        .stack-item:hover {
-            color: #fff;
-            border-color: rgba(255, 95, 95, 0.3);
-            background: rgba(255, 95, 95, 0.1);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 95, 95, 0.1);
-        }
-
-        /* --- Social Dock (Top Right) --- */
-        .social-dock {
-            position: fixed;
-            top: 40px;
-            right: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            align-items: flex-end;
-            padding-right: 0; 
-            z-index: 100;
-        }
-
-        .dock-item {
-            /* Glass styling */
-            background: rgba(15, 15, 15, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-right: none; 
-            
-            /* Shape */
-            padding: 14px 28px 14px 32px;
-            border-radius: 16px 0 0 16px;
-            
-            /* Typography */
-            color: #aaa;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 13px;
-            text-decoration: none;
-            cursor: pointer;
-            font-weight: 500;
-            
-            /* Layout */
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            
-            /* Animation */
-            transform: translateX(20px); /* Hidden slightly */
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            position: relative;
-        }
-
-        .dock-item:hover {
-            transform: translateX(0); /* Pop fully out */
-            background: rgba(30, 30, 30, 0.9);
-            color: #fff;
-            padding-right: 40px;
-            border-color: rgba(255, 255, 255, 0.15);
-            box-shadow: -10px 10px 30px rgba(0,0,0,0.4);
-        }
-
-        /* Hover colors */
-        .dock-item.discord:hover { border-left: 3px solid #5865F2; }
-        .dock-item.roblox:hover { border-left: 3px solid #ffffff; }
-        .dock-item.github:hover { border-left: 3px solid #333; }
-
-        .dock-icon {
-            font-size: 16px;
-            width: 20px;
-            text-align: center;
-            transition: color 0.3s;
-        }
-        
-        /* Icon colors on hover */
-        .dock-item.discord:hover .dock-icon { color: #5865F2; }
-        .dock-item.github:hover .dock-icon { color: #fff; }
-        
-        .arrow {
-            color: #ff5f5f;
-            font-weight: bold;
-            opacity: 0;
-            transform: translateX(-10px);
-            transition: all 0.3s ease;
-        }
-
-        .dock-item:hover .arrow {
-            opacity: 1;
-            transform: translateX(0);
-        }
-        
-        .copy-feedback {
-            position: absolute;
-            left: -80px;
-            background: #00ff9d;
-            color: #000;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: bold;
-            opacity: 0;
-            transform: translateX(10px);
-            pointer-events: none;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 5px 15px rgba(0, 255, 157, 0.2);
-        }
-        
-        .copy-feedback.show {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
     </style>
 </head>
-<body>
+<body class="bg-black min-h-screen w-full m-0 overflow-hidden select-none text-white font-sans">
 
-    <div id="canvas-container">
-        <canvas id="bg-canvas"></canvas>
-    </div>
-    
-    <!-- CRT Overlay -->
-    <div class="scanlines"></div>
-
-    <div id="ui-layer">
+    <!-- Loading Screen Overlay -->
+    <div id="loading-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black transition-opacity duration-1000">
         
-        <!-- Central Text -->
-        <div class="center-content">
-            <div class="header-sub">WSG.GG</div>
-            <h1 class="brand-name">ZOTIAX</h1>
-            
-            <!-- Tags -->
-            <div class="center-tags">
-                <div class="tag-item">
-                    <i class="fa-solid fa-code tag-icon"></i>
-                    <span>Scripter</span>
-                </div>
-                <div class="tag-item">
-                    <i class="fa-solid fa-location-dot tag-icon"></i>
-                    <span>Poland</span>
-                </div>
+        <!-- The Loader Container (Bar + Percentage) -->
+        <div id="loader-container" class="flex flex-col items-center justify-center mb-8 transition-all duration-700 ease-in-out w-full max-w-[280px]">
+            <!-- Percentage Text -->
+            <div id="loading-percent" class="text-purple-300 font-mono text-xs md:text-sm tracking-[0.2em] mb-4 drop-shadow-[0_0_8px_rgba(168,85,247,0.8)]">
+                0%
             </div>
-
-            <!-- Tech Stack -->
-            <div class="tech-stack">
-                <div class="stack-label">I Code In</div>
-                <div class="stack-list">
-                    <div class="stack-item">Lua</div>
-                    <div class="stack-item">LuaC</div>
-                    <div class="stack-item">CSS</div>
-                    <div class="stack-item">HTML</div>
-                    <div class="stack-item">Python</div>
-                    <div class="stack-item">JavaScript</div>
-                </div>
+            
+            <!-- Loading Bar Track -->
+            <div class="w-full h-[2px] bg-purple-900/40 fading-edges relative overflow-hidden">
+                <!-- Loading Bar Fill -->
+                <div id="loading-bar-fill" class="absolute top-0 left-0 h-full w-0 bg-purple-400 shadow-[0_0_15px_rgba(168,85,247,1)]"></div>
             </div>
         </div>
 
-        <!-- Right Side Social Panels -->
-        <div class="social-dock">
+        <!-- The gradient text -->
+        <h1 id="endless-text" class="font-island text-7xl md:text-9xl tracking-wide phasing-text font-normal drop-shadow-md transition-all duration-[1500ms] ease-in-out">
+            endless.net
+        </h1>
+    </div>
+
+    <!-- Main Website Content (Hidden initially) -->
+    <div id="main-content" class="hidden opacity-0 transition-opacity duration-1000 min-h-screen w-full flex flex-col bg-black relative">
+        
+        <!-- Global Background Glow -->
+        <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-900/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
+
+        <!-- Topbar -->
+        <div class="fixed top-0 left-0 w-full h-20 flex items-center justify-between px-8 z-50 bg-black/50 backdrop-blur-md">
+            <div class="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-50"></div>
             
-            <!-- Discord -->
-            <div class="dock-item discord" onclick="copyDiscord()">
-                <span class="copy-feedback" id="discord-feedback">COPIED</span>
-                <i class="fa-brands fa-discord dock-icon"></i>
-                <span>Discord</span>
-                <span class="arrow">-></span>
+            <!-- Left Logo -->
+            <div class="font-island text-5xl tracking-wide phasing-text font-normal pb-2">
+                endless.net
             </div>
-
-            <!-- Roblox -->
-            <a href="https://www.roblox.com/users/7237107162/profile" target="_blank" class="dock-item roblox">
-                <i class="fa-solid fa-gamepad dock-icon"></i>
-                <span>Roblox</span>
-                <span class="arrow">-></span>
-            </a>
-
-            <!-- GitHub -->
-            <a href="https://github.com/zotiax" target="_blank" class="dock-item github">
-                <i class="fa-brands fa-github dock-icon"></i>
-                <span>GitHub</span>
-                <span class="arrow">-></span>
-            </a>
-
         </div>
 
+        <!-- Page Content Container (Allows scrolling) -->
+        <div class="flex-1 w-full h-full pt-28 pb-12 px-6 overflow-y-auto z-10 relative">
+            
+            <!-- HOME TAB -->
+            <div class="flex flex-col items-center justify-center min-h-[70vh] w-full transition-opacity duration-500">
+                <h2 class="font-island text-6xl md:text-8xl mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-gray-400 text-center font-normal tracking-wide">
+                    welcome to endless.net
+                </h2>
+                <p class="text-purple-300/80 font-mono text-sm tracking-widest uppercase text-center mb-10">
+                    Best Gamesense Anti-aim Lua
+                </p>
+
+                <!-- Get Endless.lua Button -->
+                <button id="get-endless-btn" class="relative px-10 py-2 text-4xl md:text-5xl font-island tracking-wide text-gray-300 hover:text-purple-300 transition-colors duration-300 group cursor-pointer focus:outline-none pb-4">
+                    get endless.lua
+                    <!-- Dissolving bottom gradient bar -->
+                    <div class="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-60 group-hover:opacity-100 group-hover:shadow-[0_0_15px_rgba(168,85,247,0.8)] transition-all duration-300"></div>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Invite Menu Overlay -->
+    <div id="invite-overlay" class="fixed inset-0 z-[100] hidden flex-col items-center justify-center bg-black transition-opacity duration-1000 opacity-0">
+        <div id="invite-menu" class="bg-[#050505] border border-purple-500/40 shadow-[0_0_40px_rgba(168,85,247,0.3)] rounded-2xl p-10 max-w-lg w-full mx-4 text-center transform scale-90 transition-all duration-1000 opacity-0 relative overflow-hidden">
+            <!-- Subtle background glow inside the menu -->
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1/2 bg-purple-900/20 blur-[50px] pointer-events-none"></div>
+
+            <h3 class="font-island text-6xl md:text-7xl phasing-text mb-6 relative z-10">Endless.lua</h3>
+            
+            <p class="text-gray-400 font-mono text-sm md:text-base leading-relaxed mb-6 relative z-10">
+                Contact <span class="text-purple-400 font-bold drop-shadow-[0_0_8px_rgba(168,85,247,0.8)]">zotiax</span> on Discord for an invite.<br><br>
+                Send a message with this code:
+            </p>
+            
+            <!-- Code Container -->
+            <div class="bg-black border border-purple-900/60 rounded-lg p-4 relative z-10 group hover:border-purple-500/60 transition-colors cursor-text">
+                <p id="invite-code" class="text-purple-400 font-mono text-xl md:text-2xl tracking-[0.15em] break-all select-all drop-shadow-[0_0_8px_rgba(168,85,247,0.6)] font-bold"></p>
+            </div>
+            
+            <p class="text-gray-600 text-xs font-mono mt-6 relative z-10">Code is strictly valid for one request.</p>
+        </div>
     </div>
 
     <script>
-        // --- Discord Copy Function ---
-        function copyDiscord() {
-            const userId = "zotiax";
-            
-            // Fallback for iframe/permissions policy restrictions using execCommand
-            const textArea = document.createElement("textarea");
-            textArea.value = userId;
-            
-            // Ensure element is not visible but part of DOM
-            textArea.style.position = "fixed";
-            textArea.style.left = "-9999px";
-            textArea.style.top = "0";
-            document.body.appendChild(textArea);
-            
-            textArea.focus();
-            textArea.select();
-            
-            try {
-                const successful = document.execCommand('copy');
-                if(successful) {
-                    const feedback = document.getElementById('discord-feedback');
-                    feedback.classList.add('show');
+        document.addEventListener("DOMContentLoaded", () => {
+            const loaderContainer = document.getElementById("loader-container");
+            const percentText = document.getElementById("loading-percent");
+            const barFill = document.getElementById("loading-bar-fill");
+            const text = document.getElementById("endless-text");
+            const loadingScreen = document.getElementById("loading-screen");
+            const mainContent = document.getElementById("main-content");
+
+            const getBtn = document.getElementById("get-endless-btn");
+            const inviteOverlay = document.getElementById("invite-overlay");
+            const inviteMenu = document.getElementById("invite-menu");
+            const inviteCodeDisplay = document.getElementById("invite-code");
+
+            // --- Random Code Generator ---
+            function generateInviteCode() {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+                let result = '';
+                for (let i = 0; i < 15; i++) {
+                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return result;
+            }
+
+            // --- Button Click Event ---
+            getBtn.addEventListener("click", () => {
+                // Fade to black
+                inviteOverlay.classList.remove("hidden");
+                inviteOverlay.classList.add("flex");
+                
+                setTimeout(() => {
+                    inviteOverlay.classList.remove("opacity-0");
                     
+                    // Wait for the screen to go black, then wait "a while" (1.5s total delay)
                     setTimeout(() => {
-                        feedback.classList.remove('show');
+                        // Generate the unique code
+                        inviteCodeDisplay.innerText = generateInviteCode();
+                        
+                        // Pop up the menu
+                        inviteMenu.classList.remove("scale-90", "opacity-0");
+                        inviteMenu.classList.add("scale-100", "opacity-100");
+                        
                     }, 1500);
-                }
-            } catch (err) {
-                console.error('Fallback: Oops, unable to copy', err);
-            }
-            
-            document.body.removeChild(textArea);
-        }
-
-        // --- Background Canvas Code ---
-        {
-            const canvas = document.getElementById('bg-canvas');
-            const ctx = canvas.getContext('2d');
-            let width, height;
-
-            // Config
-            const fontSize = 15;
-            const lineHeight = 26;
-            let cols, rows;
-            
-            // State
-            const codeLines = [];
-            const particles = []; // Particle System
-            
-            let currentLineIndex = 0;
-            let currentCharIndex = 0;
-            let scrollY = 0;
-            let targetScrollY = 0;
-            let cursorBlink = 0;
-            let typeDelay = 0;
-            
-            // Mouse for interaction
-            let mouse = { x: 0, y: 0 };
-
-            // Realistic Lua/Roblox Source Code
-            const sourceCode = [
-                "-- Zotiax Engine Kernel v2.4",
-                "local RunService = game:GetService('RunService')",
-                "local Players = game:GetService('Players')",
-                "local TweenService = game:GetService('TweenService')",
-                "",
-                "local CONFIG = {",
-                "    Speed = 32,",
-                "    JumpPower = 50,",
-                "    Theme = Color3.fromRGB(255, 95, 95),",
-                "    Debug = true",
-                "}",
-                "",
-                "local function initCharacter(character)",
-                "    local humanoid = character:WaitForChild('Humanoid')",
-                "    local root = character:WaitForChild('HumanoidRootPart')",
-                "    ",
-                "    if CONFIG.Debug then",
-                "        print('[SYSTEM] Hooking character: ' .. character.Name)",
-                "    end",
-                "    ",
-                "    -- Apply movement bypass",
-                "    humanoid.WalkSpeed = CONFIG.Speed",
-                "    humanoid.UseJumpPower = true",
-                "    humanoid.JumpPower = CONFIG.JumpPower",
-                "    ",
-                "    -- Create visual aura",
-                "    local highlight = Instance.new('Highlight')",
-                "    highlight.FillColor = CONFIG.Theme",
-                "    highlight.OutlineColor = Color3.new(1, 1, 1)",
-                "    highlight.Parent = character",
-                "end",
-                "",
-                "Players.PlayerAdded:Connect(function(player)",
-                "    player.CharacterAdded:Connect(initCharacter)",
-                "end)",
-                "",
-                "RunService.Heartbeat:Connect(function(dt)",
-                "    -- Optimization Loop",
-                "    for _, player in ipairs(Players:GetPlayers()) do",
-                "        if player ~= Players.LocalPlayer then",
-                "            -- Esp / Tracking Logic",
-                "        end",
-                "    end",
-                "end)"
-            ];
-
-            // Monochromatic Red Syntax Theme
-            const theme = {
-                keyword: '#ff5f5f',   // Base Red
-                builtin: '#ff8f8f',   // Light Red/Pink
-                string: '#ffaaaa',    // Pale Red
-                number: '#ff5f5f',    // Base Red
-                comment: '#7a3333',   // Dark Desaturated Red
-                property: '#ffcece',  // Very Pale Red/White
-                default: '#e06666'    // Muted Red
-            };
-            
-            const keywords = ['local', 'function', 'end', 'if', 'then', 'else', 'return', 'true', 'false'];
-            const builtins = ['game', 'workspace', 'Instance', 'Color3', 'Vector3', 'new', 'fromRGB', 'Connect', 'WaitForChild', 'GetService'];
-
-            // --- Particle Class ---
-            class Particle {
-                constructor() {
-                    this.reset();
-                }
-                
-                reset() {
-                    this.x = Math.random() * width;
-                    this.y = Math.random() * height;
-                    this.size = Math.random() * 2;
-                    this.speedX = (Math.random() - 0.5) * 0.5;
-                    this.speedY = (Math.random() - 0.5) * 0.5;
-                    this.alpha = Math.random() * 0.5;
-                    this.life = Math.random() * 100;
-                }
-                
-                update() {
-                    this.x += this.speedX;
-                    this.y += this.speedY;
-                    this.life--;
-                    
-                    // Mouse interaction
-                    const dx = mouse.x - this.x;
-                    const dy = mouse.y - this.y;
-                    const dist = Math.sqrt(dx*dx + dy*dy);
-                    if (dist < 100) {
-                        this.x -= dx * 0.01;
-                        this.y -= dy * 0.01;
-                    }
-
-                    if (this.x < 0 || this.x > width || this.y < 0 || this.y > height || this.life < 0) {
-                        this.reset();
-                    }
-                }
-                
-                draw() {
-                    ctx.fillStyle = `rgba(255, 95, 95, ${this.alpha})`; // Reddish dust
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            }
-
-            function resize() {
-                const dpr = window.devicePixelRatio || 1;
-                width = window.innerWidth;
-                height = window.innerHeight;
-                canvas.width = width * dpr;
-                canvas.height = height * dpr;
-                ctx.scale(dpr, dpr);
-                cols = Math.floor(width / (fontSize * 0.6));
-                rows = Math.floor(height / lineHeight);
-                ctx.font = `${fontSize}px 'JetBrains Mono', monospace`;
-                ctx.textBaseline = 'top';
-                
-                // Init Particles
-                particles.length = 0;
-                for(let i=0; i<50; i++) particles.push(new Particle());
-            }
-
-            document.addEventListener('mousemove', (e) => {
-                mouse.x = e.clientX;
-                mouse.y = e.clientY;
+                }, 50);
             });
 
-            function updateCode() {
-                if (typeDelay > 0) { typeDelay--; return; }
+            // Allow normal scrolling once loaded
+            document.body.classList.remove("overflow-hidden");
+
+            // --- JS Animation for the percentage and bar width ---
+            let startTime = null;
+            const loadDuration = 2800; 
+
+            function animateLoader(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const progress = Math.min((timestamp - startTime) / loadDuration, 1);
                 
-                let chars = Math.floor(Math.random() * 3) + 1;
-                if (Math.random() > 0.95) typeDelay = 15; 
-
-                for(let k=0; k<chars; k++) {
-                    const lineStr = sourceCode[currentLineIndex % sourceCode.length];
-                    if (currentCharIndex < lineStr.length) {
-                        if (codeLines.length === 0) codeLines.push({ text: "" });
-                        let last = codeLines[codeLines.length - 1];
-                        last.text += lineStr[currentCharIndex];
-                        currentCharIndex++;
-                    } else {
-                        currentLineIndex++;
-                        currentCharIndex = 0;
-                        codeLines.push({ text: "" });
-                        typeDelay = 8; 
-                        if (codeLines.length > rows + 2) {
-                            targetScrollY = (codeLines.length - (rows - 2)) * lineHeight;
-                        }
-                    }
+                const easeProgress = 1 - Math.pow(1 - progress, 4);
+                const percent = Math.floor(easeProgress * 100);
+                
+                percentText.innerText = `${percent}%`;
+                barFill.style.width = `${easeProgress * 100}%`;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animateLoader);
                 }
             }
+            
+            requestAnimationFrame(animateLoader);
 
-            function drawHighlightedLine(text, x, y) {
-                if (text.trim().startsWith('--')) { 
-                    ctx.fillStyle = theme.comment;
-                    ctx.shadowBlur = 0;
-                    ctx.fillText(text, x, y);
-                    return;
-                }
+            setTimeout(() => {
+                loaderContainer.classList.add("hide-loader");
+                text.classList.add("expand-text");
 
-                const parts = text.split(/(\s+|[(){}[\],.;:'])/g);
-                let currentX = x;
+                setTimeout(() => {
+                    loadingScreen.classList.add("opacity-0");
 
-                for (let i = 0; i < parts.length; i++) {
-                    const part = parts[i];
-                    if (!part) continue;
-
-                    // Reset Shadow
-                    ctx.shadowBlur = 0;
-
-                    if (keywords.includes(part)) {
-                        ctx.fillStyle = theme.keyword;
-                        ctx.shadowColor = theme.keyword;
-                        ctx.shadowBlur = 6;
-                    } else if (builtins.includes(part)) {
-                        ctx.fillStyle = theme.builtin;
-                        ctx.shadowColor = theme.builtin;
-                        ctx.shadowBlur = 4;
-                    } else if (part.startsWith("'") || part.startsWith('"')) {
-                        ctx.fillStyle = theme.string;
-                    } else if (!isNaN(parseFloat(part)) && isFinite(part)) {
-                        ctx.fillStyle = theme.number;
-                    } else if (i > 0 && parts[i-1] === '.') {
-                        ctx.fillStyle = theme.property;
-                    } else {
-                        ctx.fillStyle = theme.default;
-                    }
-
-                    ctx.fillText(part, currentX, y);
-                    currentX += ctx.measureText(part).width;
-                }
-            }
-
-            function draw() {
-                scrollY += (targetScrollY - scrollY) * 0.1;
-
-                ctx.clearRect(0, 0, width, height);
-
-                const startY = 40 - scrollY;
-                const startX = 40;
-
-                // Draw Code
-                for (let i = 0; i < codeLines.length; i++) {
-                    const line = codeLines[i];
-                    const y = startY + (i * lineHeight);
-                    if (y < -lineHeight || y > height) continue;
-
-                    ctx.fillStyle = '#663333'; // Dark red line numbers
-                    ctx.shadowBlur = 0; 
-                    ctx.textAlign = 'right';
-                    ctx.fillText(i + 1, startX - 15, y);
-
-                    ctx.textAlign = 'left';
-                    drawHighlightedLine(line.text, startX, y);
-
-                    if (i === codeLines.length - 1) {
-                        cursorBlink++;
-                        const alpha = (Math.sin(cursorBlink * 0.1) + 1) / 2;
-                        const w = ctx.measureText(line.text).width;
+                    setTimeout(() => {
+                        loadingScreen.style.display = "none";
+                        mainContent.classList.remove("hidden");
                         
-                        ctx.shadowBlur = 10;
-                        ctx.shadowColor = '#ff5f5f';
-                        ctx.fillStyle = `rgba(255, 95, 95, ${alpha})`;
-                        ctx.fillRect(startX + w + 2, y + 4, 10, fontSize - 4);
-                    }
-                }
+                        setTimeout(() => {
+                            mainContent.classList.remove("opacity-0");
+                        }, 50);
 
-                // Draw Particles
-                ctx.shadowBlur = 4;
-                ctx.shadowColor = 'rgba(255, 95, 95, 0.5)';
-                for (let p of particles) {
-                    p.update();
-                    p.draw();
-                }
-            }
-
-            function animate() {
-                updateCode();
-                draw();
-                requestAnimationFrame(animate);
-            }
-
-            resize();
-            window.addEventListener('resize', resize);
-            animate();
-        }
+                    }, 1000); 
+                }, 1800); 
+            }, 3000); 
+        });
     </script>
 </body>
 </html>
